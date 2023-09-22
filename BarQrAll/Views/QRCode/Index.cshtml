@@ -1,0 +1,585 @@
+﻿@model QRCodeModel
+@{
+    ViewData["Title"] = "Generate QR Code";
+}
+
+
+<script src="\js\html5-qrcode.min.js"></script>
+<style>
+    h1 {
+        text-align: center;
+    }
+
+    #reader {
+        width: 500px;
+    }
+
+    .result {
+        background-color: green;
+        color: #fff;
+        padding: 20px;
+    }
+
+    .row {
+        display: flex;
+    }
+
+    #reader__scan_region {
+        background: white;
+    }
+
+    body {
+        font-family: arial;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    p {
+        font-weight: bold;
+    }
+
+
+
+    </style>
+
+
+<link href="~/css/style.css" rel="stylesheet" />
+<script src="~/js/file_demo_only/jsQR.js"></script>
+<script type="text/javascript" src="~/js/file_demo_only/pdf.min.js"></script>
+<script type="text/javascript" src="~/js/file_demo_only/pdf-qr.js"></script>
+
+<script type="text/javascript" src="~/js/app.js"></script>
+
+<div class="text-center">
+
+  
+        <form asp-action="Index"> 
+        <input type="radio" name="tab" id="bar" value="igotnone" onclick="show1();" checked/>
+            Bar Code generate &nbsp;&nbsp;&nbsp;
+        <input type="radio" name="tab" id="qr" value="igottwo" onclick="show2();" />
+         QR Code generate
+
+            <input type="radio" name="tab" id="file" value="igotthree" onclick="show3();" />
+            Read from Scanner Image file or Webcam 
+
+           <input type="radio" name="tab" id="pdf" value="igotfour" onclick="show4();" />
+            Read from PDF 
+         
+        <div id="div1" class="show">            
+         
+           
+            <div class="col" style="margin-right:30px;border:1px solid black">
+                <h5>Generate BarCode as Image and PDF</h5>
+                <div style="margin-left:5px;">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label style="float:left;">Enter your Text or Number </label>
+                    </div>
+                </div>
+
+                <br />
+                 <div class="row">
+                    <div class="col-md-4">
+                        <input asp-for="BarQRId" type="text" class="form-control" />
+                    </div>
+                </div>
+                 <br />
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <input class="form-control btn-primary" type="submit" value="Generate" />
+                    </div>
+                </div>
+
+                </div>
+                
+                <br />
+            </div>
+            
+        </div>
+
+        <div id="div2" class="hide">
+
+            <div class="row">
+
+                <div  style="margin-right:30px;border:1px solid black">
+
+                    <div class="row mt-2">
+                        <h5 > Generate QRcode as Image and PDF</h5>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label style="float:left">Select QR Code Type</label>
+                            <select asp-for="QRCodeType" id="QRCodeType" class="form-control" onchange="onQRCodeTypeChange()">
+                                <option value="0">--Select--</option>
+                                <option value="1">Website</option>
+                                <option value="2">Bookmark URL</option>
+                                <option value="3">SMS</option>
+                                <option value="4">WhatsApp</option>
+                                <option value="5">Email</option>
+                                <option value="6">WIFI</option>
+                                <option value="7">Text Or Number</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!--  Text  -->
+                    <div class="row mt-2 hideDiv" id="DIV7">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label style="float:left">Enter your Text or Number </label>
+                            <input asp-for="QRText" class="form-control" />
+
+                        </div>
+                    </div>
+                    <!--  Website  -->
+                    <div class="row mt-2 hideDiv" id="DIV1">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label style="float:left">Enter your website URL</label>
+                            <input autocomplete="off" type="url" asp-for="WebsiteURL" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Book Mark URL   -->
+                    <div class="row mt-2 hideDiv" id="DIV2">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label style="float:left">Enter your URL</label>
+                            <input type="url" asp-for="BookmarkURL" class="form-control" autocomplete="off" />
+                        </div>
+                    </div>
+
+                    <!--  SMS  -->
+                    <div id="DIV3" class="hideDiv">
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label style="float:left">Enter Phone Number with country code(eg. +91)</label>
+                                <input type="text" asp-for="SMSPhoneNumber" class="form-control" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label style="float:left">Enter your Message</label>
+                                <textarea asp-for="SMSBody" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--  Whats App Message  -->
+                    <div id="DIV4" class="hideDiv">
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label style="float:left">Enter WhatsApp Number with country code(eg. +91)</label>
+                                <input type="text" asp-for="WhatsAppNumber" class="form-control" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label style="float:left">Enter your Message</label>
+                                <textarea asp-for="WhatsAppMessage" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--  Compose Email  -->
+                    <div id="DIV5" class="hideDiv">
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label style="float:left">Enter Receive's Email Address</label>
+                                <input type="text" asp-for="ReceiverEmailAddress" class="form-control" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label style="float:left">Enter Email Subject</label>
+                                <input type="text" asp-for="EmailSubject" class="form-control" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label style="float:left">Enter Email Message</label>
+                                <textarea asp-for="EmailMessage" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--   WIFI   -->
+                    <div id="DIV6" class="hideDiv">
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label style="float:left">Enter WIFI Name</label>
+                                <input type="text" asp-for="WIFIName" class="form-control" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                <label style="float:left">Enter WIFI Password</label>
+                                <input type="text" asp-for="WIFIPassword" class="form-control" autocomplete="off" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <br />
+                   
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+
+                        <button style="float:left" type="submit" class="btn btn-primary">Generate</button>
+                        <br />
+                        </div>
+                    
+                    <br />
+                   
+                </div>
+                <br />
+           
+
+            </div>
+        </div>
+
+          
+        </form>
+   
+    <br />
+</div>
+
+<div class="text-center">
+<div  id="resultshow">
+
+    <br />
+      <h5>Result here</h5>
+    <div   style="padding: 30px;border:1px solid black">
+      
+        <div id="result">
+          
+            <div id="qrcode">
+                @if (!string.IsNullOrEmpty(Model.QRImageURL))
+                {
+                    <div class="row mt-2" id="qrCodeImage">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <img height="250" width="250" src="@Model.QRImageURL" />
+                        </div>
+                    </div>
+                }
+            </div>
+            <div id="barcode">
+                @if (@ViewBag.productId != null)
+                {
+
+                    <barcode content="@ViewBag.productId" width="200" height="100" class="form-control" />
+                }
+            </div>
+
+           
+           
+        </div>
+    </div>
+
+    <br />
+        <br />
+</div>
+</div>
+
+
+
+
+
+
+<div class="text-center">
+<div id="div3" class="hide" >
+
+        <br />
+        <div class="row">
+
+            <div class="text-center">
+                <h5>Read QRCode or Barcode Image from file or Webcamp  </h5>
+                <!-- QR SCANNER CODE BELOW  -->
+                <div class="row" style="margin-left:27%">
+                   
+                    <div class="col">
+                           
+                        <div id="reader"></div>
+                           
+                    
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    <br />
+
+    <br />
+</div>
+</div>
+
+
+
+
+
+
+
+<div class="text-center">
+<div id="div4" class="hide">
+    <div class="titleholder">
+            <h5>Read QRCode from pdf</h5>
+    </div>
+    <div class="formholder">
+        <div class="left">
+          
+            <div class="row" >
+                    <input id="pdfentryfile" type="file" 
+                           accept="application/pdf"
+                           size="40">
+
+                </div>
+                <br />
+                <div class="row">
+
+
+                    <button class="btn btn-primary" onclick="decodePdf()" id="decode_btn" style="width: 120px;margin-left:10px!Important;"> Decode PDF</button>
+
+                </div>
+              
+            
+            <div class="resultHolder">
+            </div>
+            <div id="holder">
+            </div>
+
+            <div id="summarydiv">
+                <label class="resultsTitle"> Summary: </label>
+                <br><br>
+                <table id="summary">
+                    <tbody>
+                    </tbody>
+                </table>
+                <br>
+                <hr>
+            </div>
+        </div>
+
+
+    </div>
+
+
+<br />
+    <br />
+
+
+    </div>
+</div>
+@section Scripts{
+
+    <script>
+      
+        if (localStorage.getItem("mytime") == null && localStorage.getItem("mytime1") == null) 
+        {
+           // alert("no value");
+            localStorage.removeItem("mytime");
+            localStorage.removeItem("mytime1");
+            show1();
+        }
+        else if (localStorage.getItem("mytime") == "bar" && localStorage.getItem("mytime1") == null)
+        {
+
+            //alert("bar");
+            document.getElementById("bar").checked = true;
+            show1();
+
+        }
+        else if (localStorage.getItem("mytime") == null && localStorage.getItem("mytime1") == "qr")
+        {
+
+            //alert("qr");
+            document.getElementById("qr").checked = true;
+            show2();
+        }
+      
+        function show1() {
+            localStorage.removeItem("mytime");
+            localStorage.removeItem("mytime1");
+            document.getElementById('div1').style.display = 'block';
+            document.getElementById('div2').style.display = 'none';
+            document.getElementById('qrcode').style.display = 'none';
+            document.getElementById('barcode').style.display = 'block';
+            localStorage.setItem("mytime","bar");
+            document.getElementById('resultshow').style.display = 'block';
+            document.getElementById('div3').style.display = 'none';
+            document.getElementById('div4').style.display = 'none';
+        }
+         
+        function show2() {
+            localStorage.removeItem("mytime");
+            localStorage.removeItem("mytime1");
+            document.getElementById('div1').style.display = 'none';
+            document.getElementById('div2').style.display = 'block';
+            document.getElementById('qrcode').style.display = 'block';
+            document.getElementById('barcode').style.display = 'none';
+            document.getElementById('div3').style.display = 'none';
+            document.getElementById('resultshow').style.display = 'block';
+            document.getElementById('div4').style.display = 'none';
+            localStorage.setItem("mytime1","qr");
+      
+        }
+        function show3() {
+     
+            localStorage.removeItem("mytime");
+            localStorage.removeItem("mytime1");
+            document.getElementById('div1').style.display = 'none';
+            document.getElementById('div2').style.display = 'none';
+            document.getElementById('div3').style.display = 'block';
+            document.getElementById('qrcode').style.display = 'none';
+            document.getElementById('barcode').style.display = 'none';
+            document.getElementById('resultshow').style.display = 'block';
+            document.getElementById('div4').style.display = 'none';
+          
+           
+        }
+
+        function show4() {
+
+            localStorage.removeItem("mytime");
+            localStorage.removeItem("mytime1");
+            document.getElementById('div1').style.display = 'none';
+            document.getElementById('div2').style.display = 'none';
+            document.getElementById('div3').style.display = 'none';
+            document.getElementById('div4').style.display = 'block';
+            document.getElementById('qrcode').style.display = 'none';
+            document.getElementById('barcode').style.display = 'none';
+            document.getElementById('qrcode').style.display = 'none';
+            document.getElementById('resultshow').style.display = 'none';
+        }
+       
+        </script>
+    <script>
+        $(document).ready(function () {
+            $("#QRCodeType").trigger("change");
+        });
+
+        function onQRCodeTypeChange() {
+            let qrcodeType = $("#QRCodeType").val();
+            $(".hideDiv").hide();
+            $("#DIV" + qrcodeType).show();
+        }
+
+        // When scan is successful fucntion will produce data
+        function onScanSuccess(qrCodeMessage) {
+            document.getElementById('barcode').style.display = 'block';
+            document.getElementById("result").innerHTML =
+                '<span class="result">' + qrCodeMessage + "</span>";
+            
+        }
+
+        // When scan is unsuccessful fucntion will produce error message
+        function onScanError(errorMessage) {
+            // Handle Scan Error
+        }
+
+        // Setting up Qr Scanner properties
+        var html5QrCodeScanner = new Html5QrcodeScanner("reader", {
+            fps: 10,
+            qrbox: 250
+        });
+
+        // in
+        html5QrCodeScanner.render(onScanSuccess, onScanError);
+    </script>
+    <script>
+    function decodePdf() {
+
+        const resultHolder = document.getElementById('holder');
+        const decoder = document.getElementById('decode_btn');
+        var summarydiv = document.getElementById('summarydiv');
+        var summaryBody = document.getElementById('summary').getElementsByTagName('tbody')[0];
+        resultHolder.innerHTML = '';
+        summaryBody.innerHTML = '';
+        summarydiv.style.display = 'none';
+        decoder.disabled = true;
+
+        // this function is used to catch the result returned from PDFQrJS
+        function recordcallback(result) {
+            console.log("PDF-QR.js result : ");
+            console.log(result);
+            if (result.success) {
+
+                if (result.codesByPage !== undefined) // full document scanned
+                {
+                    for (var page in result.codesByPage) {
+                        var div = document.getElementById('result_page' + page);
+                        if (result.codesByPage[page].length > 0)
+                                div.innerText = "Result found : " + result.codesByPage[page].join(', ');
+                        else
+                            div.innerText = "Result is here!";
+                    }
+                } else { // single page scanned
+                    var div = document.getElementById('result_page' + result.decodedPage);
+                    if (result.codes.length > 0)
+                            div.innerText = "Result found : " + result.codes.join(', ');
+                    else
+                            div.innerText = "Result is here!";
+                }
+
+                var keyDescript = { totalOnPatch: "patch", totalOnScale: "scale" };
+                for (var key in result.stats) {
+                    for (var k in result.stats[key]) {
+                            var str = result.stats[key][k] + " Result found  on " + k + " " + keyDescript[key];
+                        addrow(str);
+                    }
+                }
+                summarydiv.style.display = 'block';
+            } else {
+                console.log(result.message);
+                holder.innerText = result.message;
+            }
+
+            decoder.disabled = false;
+        }
+
+        // function which prints pages on the demo (it is an optional parameter)
+        function printTestImg(pageAsImg, pageNr) {
+
+            var div = document.createElement('div');
+            div.innerText = "Page_" + pageNr;
+            div.classList = 'resultContainer';
+            resultHolder.appendChild(div);
+
+            pageAsImg.classList = 'resultPage';
+            resultHolder.appendChild(pageAsImg);
+
+            var resultsDiv = document.createElement('div');
+            resultsDiv.id = "result_page" + pageNr;
+            resultsDiv.classList = 'resultDiv';
+            resultsDiv.innerHTML = "<img src='./media/loading.gif' height='70px' width='70px;'>";
+            resultHolder.appendChild(resultsDiv);
+        }
+
+        // decode pdf call (all code you need to call in order to scan qr codes in you pdfs
+        var input_file = document.getElementById('pdfentryfile');
+        if (input_file.value === "") {
+            alert('Please provide a valid pdf file!');
+            decoder.disabled = false;
+            return false;
+        }
+
+        if (decodeType === "allpages") {
+            PDF_QR_JS.decodeDocument(input_file, configs,
+                recordcallback, printTestImg
+            );
+        } else {
+            var pageNrInput = document.getElementById('pageNr');
+            if (pageNrInput.value === '' || parseInt(pageNrInput.value) <= 0) {
+                alert('Please provide a valid page number!');
+                decoder.disabled = false;
+                return false;
+            }
+            PDF_QR_JS.decodeSinglePage(input_file, parseInt(pageNrInput.value), configs,
+                recordcallback, printTestImg
+            );
+        }
+    }
+</script>
+
+
+}
+
+
+
+
+
